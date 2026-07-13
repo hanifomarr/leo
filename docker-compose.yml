@@ -1,0 +1,16 @@
+services:
+  mongodb:
+    image: mongo:7
+    container_name: leo-mongo
+    restart: unless-stopped
+    ports:
+      - "${MONGO_APP_PORT}:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_APP_DATABASE}
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
