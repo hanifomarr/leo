@@ -9,6 +9,17 @@ app:
   jwt:
     secret: ${JWT_SECRET}
     expiration-ms: ${JWT_EXPIRATION_MS}
+  admin:
+    bootstrap:
+      enabled: ${APP_ADMIN_BOOTSTRAP_ENABLED}
+      username: ${APP_ADMIN_BOOTSTRAP_USERNAME}
+      password: ${APP_ADMIN_BOOTSTRAP_PASSWORD}
+  agent-tier:
+    bootstrap:
+      enabled: ${APP_AGENT_TIER_BOOTSTRAP_ENABLED}
+      name: ${APP_AGENT_TIER_BOOTSTRAP_NAME}
+      description: ${APP_AGENT_TIER_BOOTSTRAP_DESCRIPTION}
+
 
 management:
   endpoints:
