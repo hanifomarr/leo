@@ -5,10 +5,12 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -20,10 +22,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final AppUserDetailsService appUserDetailsService;
+    private final SecurityResponseWriter responseWriter;
 
-    public JwtAuthenticationFilter(JwtService jwtService, AppUserDetailsService appUserDetailsService) {
+    public JwtAuthenticationFilter(JwtService jwtService, AppUserDetailsService appUserDetailsService, SecurityResponseWriter responseWriter) {
         this.jwtService = jwtService;
         this.appUserDetailsService = appUserDetailsService;
+        this.responseWriter = responseWriter;
     }
 
     @Override
@@ -49,7 +53,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String username = jwtService.extractUsername(token);
 
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = appUserDetailsService.loadUserByUsername(username);
+
+            UserDetails userDetails;
+            try {
+                userDetails = appUserDetailsService.loadUserByUsername(username);
+            } catch (UsernameNotFoundException e) {
+                responseWriter.write(response, HttpStatus.UNAUTHORIZED, "AUTH_FAILED", "Authentication Required");
+                return;
+            }
+
+            if (!userDetails.isEnabled()) {
+                responseWriter.write(response, HttpStatus.FORBIDDEN, "AGENT_SUSPENDED", "Account is suspended");
+                return;
+            }
+
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                     userDetails,
                     null,
