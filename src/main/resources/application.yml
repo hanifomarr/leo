@@ -19,6 +19,9 @@ app:
       enabled: ${APP_AGENT_TIER_BOOTSTRAP_ENABLED}
       name: ${APP_AGENT_TIER_BOOTSTRAP_NAME}
       description: ${APP_AGENT_TIER_BOOTSTRAP_DESCRIPTION}
+  product:
+    bootstrap:
+      enabled: ${PRODUCT_BOOTSTRAP_ENABLED}
 
 
 management:
