@@ -4,13 +4,16 @@ import com.selloohub.leo.product.model.Product;
 import com.selloohub.leo.product.model.ProductStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.data.support.PageableExecutionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 
@@ -45,5 +48,20 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
                 pageable,
                 () -> mongoTemplate.count(query, Product.class)
         );
+    }
+
+    @Override
+    public Optional<Product> applyStockDelta(String productId, int delta) {
+
+        Query query = Query.query(
+                Criteria.where("_id").is(productId)
+                        .and("deleted").is(false)
+                        .and("stockQty").gte(-delta)
+        );
+        Update update = new Update().inc("stockQty", delta);
+        FindAndModifyOptions options = FindAndModifyOptions.options().returnNew(true);
+        Product updated = mongoTemplate.findAndModify(query, update, options, Product.class);
+
+        return Optional.ofNullable(updated);
     }
 }
