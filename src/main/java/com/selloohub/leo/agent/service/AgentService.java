@@ -2,7 +2,6 @@ package com.selloohub.leo.agent.service;
 
 import com.selloohub.leo.agent.dto.*;
 import com.selloohub.leo.agent.model.Agent;
-import com.selloohub.leo.agent.model.AgentTier;
 import com.selloohub.leo.agent.model.TierStatus;
 import com.selloohub.leo.agent.repository.AgentRepository;
 import com.selloohub.leo.agent.repository.AgentTierRepository;
@@ -10,6 +9,7 @@ import com.selloohub.leo.common.exception.ConflictException;
 import com.selloohub.leo.common.exception.ResourceNotFoundException;
 import com.selloohub.leo.common.response.PageResponse;
 import com.selloohub.leo.common.util.PasswordGenerator;
+import com.selloohub.leo.common.util.PhoneNormalizer;
 import com.selloohub.leo.common.util.ReferralCodeGenerator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -31,11 +31,13 @@ public class AgentService {
     }
 
     public CreateAgentResponse createAgent(CreateAgentRequest request) {
-        AgentTier tier = agentTierRepository.findById(request.tierId())
+        String normalizedPhone = PhoneNormalizer.normalize(request.phone());
+        agentTierRepository.findById(request.tierId())
                 .filter(t -> t.getStatus() == TierStatus.ACTIVE)
                 .orElseThrow(() -> new ResourceNotFoundException("Tier not found or inactive"));
 
-        if (agentRepository.existsByPhone(request.phone()))
+
+        if (agentRepository.existsByPhone(normalizedPhone))
             throw new ConflictException("AGENT_PHONE_EXISTS", "Phone already exists");
         if (agentRepository.existsByUsername(request.username())) {
             throw new ConflictException("AGENT_USERNAME_EXISTS", "Username already exists");
@@ -45,7 +47,7 @@ public class AgentService {
         String referralCode = ReferralCodeGenerator.generate(6);
         String passwordHash = passwordEncoder.encode(initialPassword);
 
-        Agent agent = new Agent(request.tierId(), request.name(), request.phone(), request.email(), request.username(), passwordHash, referralCode);
+        Agent agent = new Agent(request.tierId(), request.name(), normalizedPhone, request.email(), request.username(), passwordHash, referralCode);
         agentRepository.save(agent);
 
         return CreateAgentResponse.from(agent, initialPassword);
