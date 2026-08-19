@@ -8,8 +8,9 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface ProductRepository extends SoftDeleteRepository<Product, String>, ProductRepositoryCustom {
+public interface ProductRepository extends SoftDeleteRepository<Product, String, ProductStatus>, ProductRepositoryCustom {
 
     boolean existsBySku(String sku);
+
     Optional<Product> findBySkuAndDeletedFalseAndStatus(String sku, ProductStatus status);
 }
