@@ -21,8 +21,10 @@ app:
       description: ${APP_AGENT_TIER_BOOTSTRAP_DESCRIPTION}
   product:
     bootstrap:
-      enabled: ${PRODUCT_BOOTSTRAP_ENABLED}
-
+      enabled: ${APP_PRODUCT_BOOTSTRAP_ENABLED}
+  fulfillment:
+    bootstrap:
+      enabled: ${APP_FULFILLMENT_BOOTSTRAP_ENABLED}
 
 management:
   endpoints:
