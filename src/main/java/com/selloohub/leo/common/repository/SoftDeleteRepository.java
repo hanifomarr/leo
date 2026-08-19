@@ -9,11 +9,15 @@ import org.springframework.data.repository.NoRepositoryBean;
 import java.util.Optional;
 
 @NoRepositoryBean
-public interface SoftDeleteRepository<T, ID> extends MongoRepository<T, ID> {
+public interface SoftDeleteRepository<T, ID, S> extends MongoRepository<T, ID> {
 
     @Query("{'deleted': false}")
     Page<T> findAllActive(Pageable pageable);
 
     @Query("{'_id': ?0, 'deleted': false}")
     Optional<T> findActiveById(ID id);
+
+    @Query("{'_id': ?0, 'deleted': false, 'status': ?1}")
+    Optional<T> findActiveByIdAndStatus(ID id, S status);
+
 }

@@ -1,13 +1,14 @@
 package com.selloohub.leo.admin.repository;
 
 import com.selloohub.leo.admin.model.Admin;
+import com.selloohub.leo.admin.model.AdminStatus;
 import com.selloohub.leo.common.repository.SoftDeleteRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface AdminRepository extends SoftDeleteRepository<Admin, String> {
+public interface AdminRepository extends SoftDeleteRepository<Admin, String, AdminStatus> {
 
     Optional<Admin> findByUsername(String username);
     boolean existsByUsername(String username);

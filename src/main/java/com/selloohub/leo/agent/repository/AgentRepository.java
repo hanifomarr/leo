@@ -1,13 +1,14 @@
 package com.selloohub.leo.agent.repository;
 
 import com.selloohub.leo.agent.model.Agent;
+import com.selloohub.leo.agent.model.AgentStatus;
 import com.selloohub.leo.common.repository.SoftDeleteRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface AgentRepository extends SoftDeleteRepository<Agent, String> {
+public interface AgentRepository extends SoftDeleteRepository<Agent, String, AgentStatus> {
 
     Optional<Agent> findByUsername(String username);
 
@@ -16,4 +17,6 @@ public interface AgentRepository extends SoftDeleteRepository<Agent, String> {
     boolean existsByPhone(String phone);
 
     boolean existsByReferralCode(String referralCode);
+
+    Optional<Agent> findByReferralCode(String referralCode);
 }
