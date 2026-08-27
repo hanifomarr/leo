@@ -1,6 +1,8 @@
 spring:
   application:
     name: leo
+  profiles:
+    active: dev
   data:
     mongodb:
       uri: mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@localhost:${MONGO_APP_PORT}/${MONGO_APP_DATABASE}?authSource=admin
@@ -25,6 +27,10 @@ app:
   fulfillment:
     bootstrap:
       enabled: ${APP_FULFILLMENT_BOOTSTRAP_ENABLED}
+
+  payment:
+    fake:
+      outcome: ${APP_PAYMENT_FAKE_OUTCOME}
 
 management:
   endpoints:

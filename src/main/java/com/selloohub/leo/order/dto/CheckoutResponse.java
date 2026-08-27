@@ -12,7 +12,8 @@ public record CheckoutResponse(
         BigDecimal subtotal,
         BigDecimal fulfillmentFee,
         BigDecimal grandTotal,
-        Instant expiresAt
+        Instant expiresAt,
+        String paymentUrl
 ) {
     public static CheckoutResponse from(Order order) {
         return new CheckoutResponse(
@@ -21,7 +22,8 @@ public record CheckoutResponse(
                 order.getSubtotal(),
                 order.getFulfillmentFee(),
                 order.getGrandTotal(),
-                order.getExpiresAt()
+                order.getExpiresAt(),
+                order.getPayment().getPaymentUrl()
         );
     }
 }

@@ -17,6 +17,9 @@ import com.selloohub.leo.order.dto.CheckoutRequest;
 import com.selloohub.leo.order.dto.CheckoutResponse;
 import com.selloohub.leo.order.model.*;
 import com.selloohub.leo.order.repository.OrderRepository;
+import com.selloohub.leo.payment.gateway.BillRef;
+import com.selloohub.leo.payment.gateway.BillRequest;
+import com.selloohub.leo.payment.gateway.PaymentGatewayClient;
 import com.selloohub.leo.product.model.Product;
 import com.selloohub.leo.product.model.ProductStatus;
 import com.selloohub.leo.product.repository.ProductRepository;
@@ -37,17 +40,18 @@ public class CheckoutService {
     private final FulfillmentConfigRepository fulfillmentConfigRepository;
     private final AgentRepository agentRepository;
     private final OrderNumberGenerator orderNumberGenerator;
+    private final PaymentGatewayClient paymentGatewayClient;
 
-    public CheckoutService(OrderRepository orderRepository, ProductRepository productRepository, PickupLocationRepository pickupLocationRepository, FulfillmentConfigRepository fulfillmentConfigRepository, AgentRepository agentRepository, OrderNumberGenerator orderNumberGenerator) {
+    public CheckoutService(OrderRepository orderRepository, ProductRepository productRepository, PickupLocationRepository pickupLocationRepository, FulfillmentConfigRepository fulfillmentConfigRepository, AgentRepository agentRepository, OrderNumberGenerator orderNumberGenerator, PaymentGatewayClient paymentGatewayClient) {
         this.orderRepository = orderRepository;
         this.productRepository = productRepository;
         this.pickupLocationRepository = pickupLocationRepository;
         this.fulfillmentConfigRepository = fulfillmentConfigRepository;
         this.agentRepository = agentRepository;
         this.orderNumberGenerator = orderNumberGenerator;
+        this.paymentGatewayClient = paymentGatewayClient;
     }
 
-    //TODO Risk of Data Corruption, do we need @Transactional?
     public CheckoutResponse checkout(CheckoutRequest request, String refCode) {
         List<OrderLine> lines = new ArrayList<>();
         BigDecimal subtotal = BigDecimal.ZERO;
@@ -100,6 +104,10 @@ public class CheckoutService {
                 null,
                 null,
                 Instant.now().plus(24, ChronoUnit.HOURS)
+        );
+
+        BillRef billRef = paymentGatewayClient.createBill(new BillRequest(order.getOrderNo(), grandTotal));
+        order.setPayment(new PaymentBlock(billRef.gateway(), billRef.billCode(), billRef.paymentUrl())
         );
         orderRepository.save(order);
         return CheckoutResponse.from(order);
