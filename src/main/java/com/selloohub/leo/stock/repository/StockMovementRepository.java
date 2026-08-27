@@ -12,4 +12,6 @@ public interface StockMovementRepository extends MongoRepository<StockMovement, 
     Page<StockMovement> findByProductIdOrderByCreatedAtDesc(String productId, Pageable pageable);
 
     boolean existsByProductId(String productId);
+
+    boolean existsByOrderIdAndProductId(String orderId, String productId);
 }
