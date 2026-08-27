@@ -5,7 +5,9 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.Optional;
 
-public interface OrderRepository extends MongoRepository<Order, String> {
+public interface OrderRepository extends MongoRepository<Order, String>, OrderRepositoryCustom {
 
     Optional<Order> findByOrderNoAndCustomerPhone(String orderNo, String customerPhone);
+
+    Optional<Order> findByPaymentBillCode(String billCode);
 }
