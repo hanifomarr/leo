@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: leo
+  profiles:
+    active: dev
+  data:
+    mongodb:
+      uri: mongodb://test:test@localhost:27017/leo-test?authSource=admin
+
+app:
+  jwt:
+    secret: A9smHVVChIxHc+M10BC4NesigRLs4QT4cmEiaZKS2cU=
+    expiration-ms: 43200000
+  admin:
+    bootstrap:
+      enabled: false
+      username: test-admin
+      password: test-password
+  agent-tier:
+    bootstrap:
+      enabled: false
+      name: Test Tier
+      description: Test tier for automated tests
+  product:
+    bootstrap:
+      enabled: false
+  fulfillment:
+    bootstrap:
+      enabled: false
+  payment:
+    fake:
+      outcome: PAID
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
